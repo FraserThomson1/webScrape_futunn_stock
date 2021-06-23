@@ -59,11 +59,10 @@ def get_num_discussions(comment):
 while terminate == "n":
 	print("-------------------------------------------------------------------------------")
 	url = input("Enter url for stock: ")
-	target_year = int(input("Enter search year: "))
-	target_month = int(input("Enter search month: "))
-	target_day = int(input("Enter search day: "))
-
 	try:
+		target_year = int(input("Enter search year: "))
+		target_month = int(input("Enter search month: "))
+		target_day = int(input("Enter search day: "))
 		target_date = date(target_year, target_month, target_day)
 	except ValueError:
 		print("\ndate entered has invalid value.")
