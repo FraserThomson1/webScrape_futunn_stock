@@ -3,6 +3,7 @@ from selenium import webdriver
 import selenium
 import time
 from datetime import date
+from selenium.webdriver.chrome.options import Options
 
 url = input("Enter url for stock: ")
 target_year = int(input("Enter search year: "))
@@ -10,7 +11,10 @@ target_month = int(input("Enter search month: "))
 target_day = int(input("Enter search day: "))
 target_date = date(target_year, target_month, target_day)
 PATH = "chromedriver.exe"
-driver = webdriver.Chrome(PATH)
+chrome_options = Options()
+chrome_options.add_argument('--headless')
+chrome_options.add_argument('--log-level=3')
+driver = webdriver.Chrome(PATH,options = chrome_options)
 
 def get_comments_link(url):
 	#try to load page
@@ -58,7 +62,7 @@ def get_num_discussions(comment):
 	discussions = comment.find_all(class_ = "js-commentItem")
 	return len(discussions)
 
-
+print("-------------------------------------------------------------------------------")
 if(target_date>date.today()):
 	print("Search date can not be later than current date.")
 	driver.quit()
