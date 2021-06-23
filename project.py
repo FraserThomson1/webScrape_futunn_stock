@@ -11,7 +11,6 @@ target_month = int(input("Enter search month: "))
 target_day = int(input("Enter search day: "))
 target_date = date(target_year, target_month, target_day)
 chrome_options = Options()
-chrome_options.add_argument('--headless')
 chrome_options.add_argument('--log-level=3')
 driver = webdriver.Chrome(options = chrome_options)
 
