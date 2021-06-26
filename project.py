@@ -1,3 +1,4 @@
+#developed by fraser thomson
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import selenium
