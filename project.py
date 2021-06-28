@@ -17,7 +17,7 @@ def get_comments_link(url):
 	except selenium.common.exceptions.InvalidArgumentException:
 		return None
 	#get the page to display comments
-	e = driver.find_elements_by_xpath("//*[text()='评论']");
+	e = driver.find_elements_by_xpath("//*[text()='评论']")
 	if len(e) == 0: return None
 	e[0].click()
 	#get html and extract link to comments
@@ -69,7 +69,7 @@ while terminate == "n":
 		print("\ndate entered has invalid value.")
 	else:
 		if(target_date>date.today()):
-			print("\nSearch date can not be later than current date.")
+			print("\nSearch date cannot be later than current date.")
 		else:
 			print("\n")
 			driver = webdriver.Chrome(options = chrome_options)
