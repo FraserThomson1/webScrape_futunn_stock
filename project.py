@@ -17,7 +17,7 @@ def get_comments_link(url):
 	except selenium.common.exceptions.InvalidArgumentException:
 		return None
 	#get the page to display comments
-	e = driver.find_elements_by_xpath("//*[text()='评论']")
+	e = driver.find_elements_by_xpath("//*[text()='评论']")+driver.find_elements_by_xpath("//*[text()='評論']")
 	if len(e) == 0: return None
 	e[0].click()
 	#get html and extract link to comments
