@@ -13,13 +13,10 @@ terminate = "n"
 def get_comments_link(url):
 	#try to load page
 	try:
-		driver.get(url)
+		#display page with comments
+		driver.get(url+"/comments")
 	except selenium.common.exceptions.InvalidArgumentException:
 		return None
-	#get the page to display comments
-	e = driver.find_elements_by_xpath("//*[text()='评论']")+driver.find_elements_by_xpath("//*[text()='評論']")
-	if len(e) == 0: return None
-	e[0].click()
 	#get html and extract link to comments
 	pg_src = driver.page_source
 	src = BeautifulSoup(pg_src,"html.parser")
@@ -68,10 +65,10 @@ while terminate == "n":
 	except ValueError:
 		print("\ndate entered has invalid value.")
 	else:
+		start_time = time.time()
 		if(target_date>date.today()):
 			print("\nSearch date cannot be later than current date.")
 		else:
-			print("\n")
 			driver = webdriver.Chrome(options = chrome_options)
 			print("\n")
 			comments_link = get_comments_link(url)
@@ -81,7 +78,7 @@ while terminate == "n":
 				current_date = date.today()
 				#go to comments link
 				driver.get(comments_link)
-				time.sleep(7)
+				time.sleep(5)
 				#extract comments
 				comments_html = BeautifulSoup(driver.page_source,"html.parser")
 				comments = comments_html.find_all(class_="feedBox01 js-feedItem")
@@ -104,7 +101,7 @@ while terminate == "n":
 						target_comments = find_target_comments(comments,current_date,target_date)
 
 				driver.quit()
-
+				end_time = time.time()
 				if not stop:
 					print("\nTotal number of posts since %s/%s/%s/00:00 : %s posts\n"%(target_year,target_month,target_day,str(len(target_comments))))
 					#get count of discussions under each comment
@@ -112,5 +109,5 @@ while terminate == "n":
 						print("POST %i"%(i+1))
 						print("time:%s"%(target_comments[i].find(class_="time").find("a").contents[0]))
 						print("number of comments:%s\n"%(get_num_discussions(target_comments[i])))
-
+	print("time taken: %s seconds"%(end_time-start_time))
 	terminate = input("\n\nTerminate program?(y/n):")
