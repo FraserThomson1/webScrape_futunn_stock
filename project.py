@@ -43,11 +43,13 @@ def check_time(time, current_date,target_date):
 	return False
 
 def find_target_comments(comments,current_date,target_date):
-	for i in range(len(comments)):
+	for i in range(len(comments)-1,-1,-1):
 		time = comments[i].find(class_="time").find("a").contents[0].split(" ")
-		if not check_time(time, current_date, target_date):
-			return comments[:i]
-	return None 
+		if check_time(time, current_date, target_date):
+			if i == len(comments)-1:
+				return None
+			else:
+				return comments[:i+1] 
 
 def get_num_discussions(comment):
 	discussions = comment.find_all(class_ = "js-commentItem")
