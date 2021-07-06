@@ -7,7 +7,6 @@ from datetime import date
 import datetime
 from selenium.webdriver.chrome.options import Options
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 
 chrome_options = Options()
 chrome_options.add_argument('--log-level=3')
