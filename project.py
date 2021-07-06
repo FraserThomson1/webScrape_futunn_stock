@@ -4,7 +4,9 @@ from selenium import webdriver
 import selenium
 import time
 from datetime import date
+import datetime
 from selenium.webdriver.chrome.options import Options
+import matplotlib.pyplot as plt
 
 chrome_options = Options()
 chrome_options.add_argument('--log-level=3')
@@ -42,6 +44,19 @@ def check_time(time, current_date,target_date):
 		else: return True
 	return False
 
+def get_date(comment):
+	time = comment.find(class_="time").find("a").contents[0].split(" ")
+	if (time[1] == "minutes" and time[2] == "ago") or (time[0] == "Today"):
+		t = date.today()
+	elif time[0]=="1" and time[1]=="day" and time[2]=="ago":
+		t = date.today() - datetime.timedelta(days=1)
+	elif len(time[0].split("-")) == 2:
+		t = date(date.today().year, int(time[0].split("-")[0]), int(time[0].split("-")[1]))
+	else:
+		t = date(int(time[0].split("-")[0]), int(time[0].split("-")[1]), int(time[0].split("-")[2]))
+	print(t)
+	return t
+
 def find_target_comments(comments,current_date,target_date):
 	for i in range(len(comments)-1,-1,-1):
 		time = comments[i].find(class_="time").find("a").contents[0].split(" ")
@@ -54,6 +69,38 @@ def find_target_comments(comments,current_date,target_date):
 def get_num_discussions(comment):
 	discussions = comment.find_all(class_ = "js-commentItem")
 	return len(discussions)
+
+def get_date_comments(comments,target_date):
+	dates = dict()
+	tmp = target_date
+	for i in range(len(comments)-1,-1,-1):
+		d = get_date(comments[i])
+		if i == len(comments)-1:
+			if (d - target_date).days > 0:
+				for j in range((d - target_date).days):
+					dates[target_date+datetime.timedelta(days=j)] = 0
+		if d in dates.keys():
+			dates[d] += 1
+		else:
+			if (d - tmp).days > 1:
+				for j in range(1,(d - tmp).days):
+					dates[tmp+datetime.timedelta(days=j)] = 0
+			dates[d] = 1
+		tmp = d
+	if not date.today() in dates.keys():
+		for i in range(1,(date.today() - tmp).days+1):
+			dates[tmp + datetime.timedelta(days=i)] = 0
+	return dates
+
+def plot_data(comments,target_date):
+	data = get_date_comments(comments,target_date)
+	x = [d.strftime("%Y/%m/%d") for d in data.keys()]
+	y = list(data.values())
+	plt.figure(figsize=(15,4))
+	plt.plot(x,y)
+	plt.xticks(rotation=90)
+	plt.tight_layout()
+	plt.show()
 
 
 while terminate == "n":
@@ -111,5 +158,6 @@ while terminate == "n":
 						print("POST %i"%(i+1))
 						print("time:%s"%(target_comments[i].find(class_="time").find("a").contents[0]))
 						print("number of comments:%s\n"%(get_num_discussions(target_comments[i])))
+					plot_data(target_comments,target_date)
 	print("time taken: %s seconds"%(end_time-start_time))
 	terminate = input("\n\nTerminate program?(y/n):")
