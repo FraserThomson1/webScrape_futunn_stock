@@ -7,6 +7,7 @@ from datetime import date
 import datetime
 from selenium.webdriver.chrome.options import Options
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 chrome_options = Options()
 chrome_options.add_argument('--log-level=3')
@@ -103,10 +104,12 @@ def plot_data(comments,target_date):
 		else:
 			y1.append(y1[-1]+val)
 	plot1 = plt.figure(figsize=(15,4))
-	plt.plot(x,y)
+	plt.bar(x,y)
 	plt.xticks(rotation=90)
 	plt.title("day-to-day trend graph")
 	plt.ylabel("Number of comments")
+	plt.xlabel("Date")
+	plt.gcf().autofmt_xdate()
 	plt.tight_layout()
 	
 	plot2 = plt.figure(figsize=(15,4))
@@ -114,6 +117,8 @@ def plot_data(comments,target_date):
 	plt.xticks(rotation=90)
 	plt.title("cumulative distribution graph")
 	plt.ylabel("Number of comments")
+	plt.xlabel("Date")
+	plt.gcf().autofmt_xdate()
 	plt.tight_layout()
 	
 	plt.show()
