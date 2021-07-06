@@ -54,7 +54,6 @@ def get_date(comment):
 		t = date(date.today().year, int(time[0].split("-")[0]), int(time[0].split("-")[1]))
 	else:
 		t = date(int(time[0].split("-")[0]), int(time[0].split("-")[1]), int(time[0].split("-")[2]))
-	print(t)
 	return t
 
 def find_target_comments(comments,current_date,target_date):
@@ -95,11 +94,28 @@ def get_date_comments(comments,target_date):
 def plot_data(comments,target_date):
 	data = get_date_comments(comments,target_date)
 	x = [d.strftime("%Y/%m/%d") for d in data.keys()]
+	x1 = [d.strftime("%Y/%m/%d") for d in data.keys()]
 	y = list(data.values())
-	plt.figure(figsize=(15,4))
+	y1 = []
+	for val in y:
+		if len(y1) == 0:
+			y1.append(val)
+		else:
+			y1.append(y1[-1]+val)
+	plot1 = plt.figure(figsize=(15,4))
 	plt.plot(x,y)
 	plt.xticks(rotation=90)
+	plt.title("day-to-day trend graph")
+	plt.ylabel("Number of comments")
 	plt.tight_layout()
+	
+	plot2 = plt.figure(figsize=(15,4))
+	plt.plot(x1,y1)
+	plt.xticks(rotation=90)
+	plt.title("cumulative distribution graph")
+	plt.ylabel("Number of comments")
+	plt.tight_layout()
+	
 	plt.show()
 
 
