@@ -7,6 +7,7 @@ requirements:
     - selenium
     - time
     - datetime
+    - matplotlib
   2. ChromeDriver
   3. Good internet connection
 
@@ -16,4 +17,4 @@ How to Run:
   3. Open command line from folder and type "python project.py"
   4. Input a valid website corresponding to a stock on the site(e.g. https://www.futunn.com/stock/800100-HK)
   5. Input valid Year Month Day for the date you want the program to start counting posts from
-  6. Wait for the program to run and return number of posts since 00:00 of that date.
+  6. Wait for the program to run and return number of posts since 00:00 of that date and graph of the data.
