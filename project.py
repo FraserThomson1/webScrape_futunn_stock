@@ -63,7 +63,8 @@ def find_target_comments(comments,current_date,target_date):
 			if i == len(comments)-1:
 				return None
 			else:
-				return comments[:i+1] 
+				return comments[:i+1]
+	return None
 
 def get_num_discussions(comment):
 	discussions = comment.find_all(class_ = "js-commentItem")
@@ -147,31 +148,32 @@ while terminate == "n":
 				current_date = date.today()
 				#go to comments link
 				driver.get(comments_link)
-				time.sleep(5)
 				#extract comments
 				comments_html = BeautifulSoup(driver.page_source,"html.parser")
 				comments = comments_html.find_all(class_="feedBox01 js-feedItem")
+				tries = 0
 				#extract comments to be analysed
 				target_comments = find_target_comments(comments,current_date,target_date)
-				stop = False
-				while target_comments == None and not stop:
+				while target_comments == None and tries <= 4:
 					#try load more comments
 					try:
 						e = (driver.find_elements_by_xpath("//*[text()='More']")+driver.find_elements_by_xpath("//*[text()='Loading…']")+driver.find_elements_by_xpath("//*[text()='Reload']"))[0]; 
 						e.click()
-					except selenium.common.exceptions.ElementNotInteractableException: 
-						print("\nCheck your internet connection quality.")
-						stop = True
+					except (selenium.common.exceptions.ElementNotInteractableException,IndexError):
+                                                tries += 1
+                                                print("Failed to load more comments, retrying...")
+                                                continue
 					else:
 						#extract comments
 						comments_html = BeautifulSoup(driver.page_source,"html.parser")
 						comments = comments_html.find_all(class_="feedBox01 js-feedItem")
 						#extract comments to be analysed
 						target_comments = find_target_comments(comments,current_date,target_date)
+						tries = 0
 
 				driver.quit()
 				end_time = time.time()
-				if not stop:
+				if tries <= 4:
 					print("\nTotal number of posts since %s/%s/%s/00:00 : %s posts\n"%(target_year,target_month,target_day,str(len(target_comments))))
 					#get count of discussions under each comment
 					for i in range(len(target_comments)):
@@ -179,5 +181,7 @@ while terminate == "n":
 						print("time:%s"%(target_comments[i].find(class_="time").find("a").contents[0]))
 						print("number of comments:%s\n"%(get_num_discussions(target_comments[i])))
 					plot_data(target_comments,target_date)
+				else:
+                                        print("\nPlease check internaet connection and try again.\n")
 	print("time taken: %s seconds"%(end_time-start_time))
 	terminate = input("\n\nTerminate program?(y/n):")
