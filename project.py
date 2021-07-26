@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 chrome_options = Options()
 chrome_options.add_argument('--log-level=3')
 terminate = "n"
+preload_num = 10
 
 def get_comments_link(url):
 	#try to load page
@@ -148,28 +149,38 @@ while terminate == "n":
 				current_date = date.today()
 				#go to comments link
 				driver.get(comments_link)
+				time.sleep(2)
 				#extract comments
 				comments_html = BeautifulSoup(driver.page_source,"html.parser")
-				comments = comments_html.find_all(class_="feedBox01 js-feedItem")
+				comments = comments_html.find(id="feedList").find("div").find_all(class_="feedBox01 js-feedItem",recursive=False)
 				tries = 0
 				#extract comments to be analysed
 				target_comments = find_target_comments(comments,current_date,target_date)
-				while target_comments == None and tries <= 4:
+				while target_comments == None:
 					#try load more comments
-					try:
-						e = (driver.find_elements_by_xpath("//*[text()='More']")+driver.find_elements_by_xpath("//*[text()='Loading…']")+driver.find_elements_by_xpath("//*[text()='Reload']"))[0]; 
-						e.click()
-					except (selenium.common.exceptions.ElementNotInteractableException,IndexError):
-                                                tries += 1
-                                                print("Failed to load more comments, retrying...")
-                                                continue
-					else:
-						#extract comments
-						comments_html = BeautifulSoup(driver.page_source,"html.parser")
-						comments = comments_html.find_all(class_="feedBox01 js-feedItem")
-						#extract comments to be analysed
-						target_comments = find_target_comments(comments,current_date,target_date)
-						tries = 0
+                                        for _ in range(preload_num):
+                                                try:
+                                                        e = (driver.find_elements_by_xpath("//*[text()='More']")+driver.find_elements_by_xpath("//*[text()='Loading…']")+driver.find_elements_by_xpath("//*[text()='Reload']"))[0]; 
+                                                        e.click()
+                                                except (selenium.common.exceptions.ElementNotInteractableException,IndexError):
+                                                        tries += 1
+                                                        print("Failed to load more comments, retrying...")
+                                                        time.sleep(1)
+                                                        if tries < 5:
+                                                                continue
+                                                        else:
+                                                                break
+                                                else:
+                                                        time.sleep(1)
+                                        if tries >= 5:
+                                                break
+                                        else:
+                                                #extract comments
+                                                comments_html = BeautifulSoup(driver.page_source,"html.parser")
+                                                comments = comments_html.find(id="feedList").find("div").find_all(class_="feedBox01 js-feedItem",recursive=False)
+                                                #extract comments to be analysed
+                                                target_comments = find_target_comments(comments,current_date,target_date)
+                                                tries = 0
 
 				driver.quit()
 				end_time = time.time()
@@ -182,6 +193,6 @@ while terminate == "n":
 						print("number of comments:%s\n"%(get_num_discussions(target_comments[i])))
 					plot_data(target_comments,target_date)
 				else:
-                                        print("\nPlease check internaet connection and try again.\n")
+                                        print("\nPlease check internet connection and try again.\n")
 	print("time taken: %s seconds"%(end_time-start_time))
 	terminate = input("\n\nTerminate program?(y/n):")
