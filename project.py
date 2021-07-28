@@ -31,10 +31,10 @@ def get_comments_link(url):
 def check_time(time, current_date,target_date):
 	days = (current_date - target_date).days
 	if days == 0:
-		if (time[1] == "minutes" and time[2] == "ago") or (time[0] == "Today"): 
+		if (time[1] == "minutes") or (time[0] == "Today") or (time[1] == "分钟前") or (time[0] == "今天") or (time[1] == "分鍾前"): 
 			return True
 	elif days == 1:
-		if (time[1] == "minutes" and time[2] == "ago") or (time[0] == "Today") or (time[0]=="1" and time[1]=="day" and time[2]=="ago"):return True
+		if (time[1] == "minutes") or (time[0] == "Today") or (time[1] == "分钟前") or (time[1] == "分鍾前") or (time[0] == "今天") or (time[0]=="1" and time[1]=="day") or (time[0] == "昨天"):return True
 	elif current_date.year == target_date.year:
 		if len(time[0].split("-")) == 2:
 			if date(current_date.year, int(time[0].split("-")[0]), int(time[0].split("-")[1])) >= target_date:return True 
@@ -47,9 +47,9 @@ def check_time(time, current_date,target_date):
 
 def get_date(comment):
 	time = comment.find(class_="time").find("a").contents[0].split(" ")
-	if (time[1] == "minutes" and time[2] == "ago") or (time[0] == "Today"):
+	if (time[1] == "minutes") or (time[0] == "Today") or (time[1] == "分钟前") or (time[0] == "今天") or (time[1] == "分鍾前"):
 		t = date.today()
-	elif time[0]=="1" and time[1]=="day" and time[2]=="ago":
+	elif (time[0]=="1" and time[1]=="day") or (time[0] == "昨天"):
 		t = date.today() - datetime.timedelta(days=1)
 	elif len(time[0].split("-")) == 2:
 		t = date(date.today().year, int(time[0].split("-")[0]), int(time[0].split("-")[1]))
@@ -160,8 +160,13 @@ while terminate == "n":
 					#try load more comments
                                         for _ in range(preload_num):
                                                 try:
-                                                        e = (driver.find_elements_by_xpath("//*[text()='More']")+driver.find_elements_by_xpath("//*[text()='Loading…']")+driver.find_elements_by_xpath("//*[text()='Reload']"))[0]; 
-                                                        e.click()
+                                                        e = driver.find_elements_by_xpath("//*[text()='More']")
+                                                        e += driver.find_elements_by_xpath("//*[text()='Loading…']")
+                                                        e += driver.find_elements_by_xpath("//*[text()='Reload']")
+                                                        e += driver.find_elements_by_xpath("//*[text()='查看更多']")
+                                                        e += driver.find_elements_by_xpath("//*[text()='加載中...']")
+                                                        e += driver.find_elements_by_xpath("//*[text()='加载中...']")
+                                                        e[0].click()
                                                 except (selenium.common.exceptions.ElementNotInteractableException,IndexError):
                                                         tries += 1
                                                         print("Failed to load more comments, retrying...")
@@ -171,7 +176,7 @@ while terminate == "n":
                                                         else:
                                                                 break
                                                 else:
-                                                        time.sleep(1)
+                                                	continue
                                         if tries >= 5:
                                                 break
                                         else:
